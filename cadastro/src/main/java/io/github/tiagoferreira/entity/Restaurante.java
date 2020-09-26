@@ -25,6 +25,6 @@ public class Restaurante extends BaseEntity {
     private LocalDate dataCriacao;
     @UpdateTimestamp
     private LocalDateTime dataAtualizacao;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Localizacao localizacao;
 }

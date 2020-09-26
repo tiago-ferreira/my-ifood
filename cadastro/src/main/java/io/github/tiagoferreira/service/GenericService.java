@@ -3,12 +3,15 @@ package io.github.tiagoferreira.service;
 import io.github.tiagoferreira.bean.BaseBean;
 import io.github.tiagoferreira.entity.BaseEntity;
 import io.github.tiagoferreira.mapper.GenericMapper;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import org.mapstruct.factory.Mappers;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class GenericService <E extends BaseEntity, B extends BaseBean, ID extends Serializable, MAPPER extends GenericMapper<E, B>> implements IServiceBase<B,ID>{
 //    private final Logger logger = Logger.getLogger(this.getClass());
@@ -51,7 +54,7 @@ public abstract class GenericService <E extends BaseEntity, B extends BaseBean, 
     // ABSTRACT METHODS
     /////////////////////////////////////////////////////////////////////////////////
 
-    protected abstract PanacheRepository<E> getConcreteRepository();
+    protected abstract PanacheRepositoryBase<E, ID> getConcreteRepository();
 
     /////////////////////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
@@ -63,41 +66,34 @@ public abstract class GenericService <E extends BaseEntity, B extends BaseBean, 
         return (B) mapper.toBean(entity);
     }
 
-//    public B update(B bean) {
-//        E entity = (E) mapper.toEntity(bean);
-//        entity = getConcreteRepository().update(entity);
-//        return (B) mapper.toBean(entity);
-//    }
-//
-//    public void delete(ID id) {
-//        E entity = (E) getConcreteRepository().find(this.typeOfEntity, id);
-//        getConcreteRepository().remove(entity);
-//    }
+    public B update(ID id, B bean) {
+        E entity = getConcreteRepository().findById(id);
+        mapper.updateEntity(entity, bean);
+        getConcreteRepository().persist(entity);
+        return (B) mapper.toBean(entity);
+    }
 
-//    public Optional<B> findById(ID id) {
-//        E entity = getConcreteRepository().find(this.typeOfEntity, id);
-//        if (entity != null) {
-//            return (Optional<B>) Optional.of(mapper.toBean(entity));
-//        }
-//        return Optional.<B>empty();
-//    }
-//
-//    public Optional<B> findBCompositeKey(B bean) {
-//        E entity = (E) mapper.toEntity(bean);
-//        entity = getConcreteRepository().find(this.typeOfEntity, entity);
-//        if (entity != null) {
-//            return (Optional<B>) Optional.of(mapper.toBean(entity));
-//        }
-//        return Optional.<B>empty();
-//    }
-//
-//    public List<B> findAll() {
-//        List resultList = getConcreteRepository().createQuery("from " + this.typeOfEntity.getSimpleName() + " e").getResultList();
-//        if (resultList != null && !resultList.isEmpty()) {
-//            return (List<B>) mapper.toBeans(resultList);
-//        }
-//        return Collections.emptyList();
-//    }
+    public void delete(ID id) {
+        E entity = getConcreteRepository().findById(id);
+        getConcreteRepository().delete(entity);
+    }
+
+    public Optional<B> findById(ID id) {
+        E entity = getConcreteRepository().findById(id);
+        if (entity != null) {
+            return (Optional<B>) Optional.of(mapper.toBean(entity));
+        }
+        return Optional.<B>empty();
+    }
+
+
+    public List<B> findAll() {
+        List<E> resultList = getConcreteRepository().findAll().list();
+        if (resultList != null && !resultList.isEmpty()) {
+            return (List<B>) mapper.toBeans(resultList);
+        }
+        return Collections.emptyList();
+    }
 
 
     public final Class<B> getTypeOfBean() {

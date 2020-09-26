@@ -4,10 +4,11 @@ import io.github.tiagoferreira.bean.BaseBean;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 public interface IServiceBase <T extends BaseBean, ID extends Serializable> {
 
-    T findById(ID id);
+    Optional<T> findById(ID id);
 
     List<T> findAll();
 
