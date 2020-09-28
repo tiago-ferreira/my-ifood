@@ -4,6 +4,8 @@ import io.github.tiagoferreira.bean.BaseBean;
 import io.github.tiagoferreira.entity.BaseEntity;
 import io.github.tiagoferreira.mapper.GenericMapper;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mapstruct.factory.Mappers;
 
 import java.io.Serializable;
@@ -13,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GenericService <E extends BaseEntity, B extends BaseBean, ID extends Serializable, MAPPER extends GenericMapper<E, B>> implements IServiceBase<B,ID>{
-//    private final Logger logger = Logger.getLogger(this.getClass());
+public abstract class GenericService <E extends BaseEntity, B extends BaseBean, ID extends Serializable, MAPPER extends GenericMapper<E, B>> {
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
     private final Class<B> typeOfBean;
 
@@ -34,20 +36,20 @@ public abstract class GenericService <E extends BaseEntity, B extends BaseBean, 
             ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
             Type[] genericTypes = parameterizedType.getActualTypeArguments();
 
-//            this.logger.debug(genericTypes[0].getClass().getName());
+            this.logger.debug(genericTypes[0].getClass().getName());
             this.typeOfEntity = (Class<E>) genericTypes[0];
             this.typeOfBean = (Class<B>) genericTypes[1];
             this.typeOfIdEntity = (Class<ID>) genericTypes[2];
             this.mapper = Mappers.getMapper((Class<MAPPER>) genericTypes[3]);
         } catch (RuntimeException e) {
-//            this.logger.error(e.getMessage(), e);
+            this.logger.error(e.getMessage(), e);
             throw e;
         }
 
-//        if (this.logger.isInfoEnabled()) {
-//            this.logger.info(String.format("Creating a service with the bean [%s], entity [%s], key bean [%s] and key entity [%s].",
-//                    getTypeOfBean(), getTypeOfEntity(), getMapper(), getTypeOfKeyEntity()));
-//        }
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info(String.format("Creating a service with the bean [%s], entity [%s], key bean [%s] and key entity [%s].",
+                    getTypeOfBean(), getTypeOfEntity(), getMapper(), getTypeOfIdEntity()));
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////
