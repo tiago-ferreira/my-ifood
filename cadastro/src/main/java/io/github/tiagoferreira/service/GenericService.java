@@ -7,6 +7,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -45,12 +46,14 @@ public abstract class GenericService<E extends BaseEntity, B extends BaseBean, I
     // PUBLIC METHODS
     // ///////////////////////////////////////////////////////////////////////////////
 
+    @Transactional
     public B save(B bean) {
         E entity = (E) getMapper().toEntity(bean);
         getConcreteRepository().persist(entity);
         return (B) getMapper().toBean(entity);
     }
 
+    @Transactional
     public B update(ID id, B bean) {
         E entity = getConcreteRepository().findById(id);
         getMapper().updateEntity(entity, bean);
@@ -58,6 +61,7 @@ public abstract class GenericService<E extends BaseEntity, B extends BaseBean, I
         return (B) getMapper().toBean(entity);
     }
 
+    @Transactional
     public void delete(ID id) {
         E entity = getConcreteRepository().findById(id);
         getConcreteRepository().delete(entity);

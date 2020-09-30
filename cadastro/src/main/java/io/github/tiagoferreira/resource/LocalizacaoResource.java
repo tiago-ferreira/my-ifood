@@ -5,10 +5,7 @@ import io.github.tiagoferreira.service.LocalizacaoService;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -25,4 +22,23 @@ public class LocalizacaoResource {
     public List<LocalizacaoBean> findAll() {
         return localizacaoService.findAll();
     }
+
+    @POST
+    public LocalizacaoBean save(LocalizacaoBean localizacaoBean) {
+        return localizacaoService.save(localizacaoBean);
+    }
+
+    @PUT
+    @Path("/{id}")
+    public LocalizacaoBean update(@PathParam("id") Long id,  LocalizacaoBean localizacaoBean) {
+        return localizacaoService.update(id, localizacaoBean);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void delete(@PathParam("id") Long id) {
+        localizacaoService.delete(id);
+    }
+
+
 }
