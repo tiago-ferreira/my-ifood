@@ -16,7 +16,7 @@ import java.util.List;
 public class LocalizacaoResource {
 
     @Inject
-    private LocalizacaoService localizacaoService;
+    LocalizacaoService localizacaoService;
 
     @GET
     public List<LocalizacaoBean> findAll() {
